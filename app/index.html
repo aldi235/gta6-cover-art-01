@@ -3,91 +3,80 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vice Cover Studio — make GTA-style poster cover art</title>
+<title>Vice Cover Studio — GTA-style cover art maker</title>
+<meta name="description" content="Turn your own photos and a caption into GTA-style multi-panel cover art, offline in your browser. Export a PNG to share.">
 <link rel="stylesheet" href="./style.css">
 </head>
 <body>
 <main class="app">
-  <section class="panel" aria-label="Cover controls">
-    <h1>VICE COVER <span>STUDIO</span></h1>
-    <p class="intro">Turn your own photos and a caption into a Vice City poster
-      cover. Pick a layout, a size and a colour grade, frame each photo, then
-      export a PNG. Your photos never leave this machine.</p>
+  <section class="controls" aria-label="Cover controls">
+    <h1>Vice Cover <span class="accent">Studio</span></h1>
+    <p class="lede">Turn your own photos and a caption into a Vice City poster cover. Pick a layout, a size and a colour grade, frame each photo, then export a PNG. Your photos never leave this machine.</p>
 
-    <fieldset>
+    <fieldset class="group" id="layout-group">
       <legend>Layout</legend>
-      <div class="seg" id="layoutSeg" role="group" aria-label="Layout">
-        <button type="button" data-layout="vice" class="on">Vice Grid</button>
-        <button type="button" data-layout="triptych">Triptych</button>
-        <button type="button" data-layout="hero">Hero Shot</button>
-      </div>
+      <button type="button" data-value="grid" class="is-active">Vice Grid</button>
+      <button type="button" data-value="triptych">Triptych</button>
+      <button type="button" data-value="hero">Hero Shot</button>
     </fieldset>
 
-    <fieldset>
+    <fieldset class="group" id="size-group">
       <legend>Export size</legend>
-      <div class="seg" id="sizeSeg" role="group" aria-label="Export size">
-        <button type="button" data-size="square" class="on">1080 × 1080</button>
-        <button type="button" data-size="portrait">1080 × 1350</button>
-        <button type="button" data-size="wide">1920 × 1080</button>
-      </div>
+      <button type="button" data-value="square" class="is-active">1080 × 1080</button>
+      <button type="button" data-value="portrait">1080 × 1350</button>
+      <button type="button" data-value="wide">1920 × 1080</button>
     </fieldset>
 
-    <fieldset>
+    <fieldset class="group" id="grade-group">
       <legend>Colour grade</legend>
-      <div class="seg" id="gradeSeg" role="group" aria-label="Colour grade">
-        <button type="button" data-grade="sunset" class="on">Vice Sunset</button>
-        <button type="button" data-grade="neon">Neon Night</button>
-        <button type="button" data-grade="noir">Palm Noir</button>
-        <button type="button" data-grade="pastel">Pastel Miami</button>
-      </div>
+      <button type="button" data-value="sunset" class="is-active">Vice Sunset</button>
+      <button type="button" data-value="neon">Neon Night</button>
+      <button type="button" data-value="noir">Palm Noir</button>
+      <button type="button" data-value="pastel">Pastel Miami</button>
     </fieldset>
 
-    <fieldset>
+    <fieldset class="group photos">
       <legend>Photos</legend>
-      <p class="hint">Click a panel in the preview to pick it, then drag its
-        photo to reframe it and scroll to zoom. You can also drop an image
-        file straight onto a panel.</p>
-      <div class="slots" id="slots">
-        <div class="slot" data-slot="0">
-          <span class="slot-name">Panel 1</span>
-          <label class="upload">Upload <input type="file" accept="image/*" data-upload="0"></label>
-          <button type="button" class="sample" data-sample="0">Sample</button>
-        </div>
-        <div class="slot" data-slot="1">
-          <span class="slot-name">Panel 2</span>
-          <label class="upload">Upload <input type="file" accept="image/*" data-upload="1"></label>
-          <button type="button" class="sample" data-sample="1">Sample</button>
-        </div>
-        <div class="slot" data-slot="2">
-          <span class="slot-name">Panel 3</span>
-          <label class="upload">Upload <input type="file" accept="image/*" data-upload="2"></label>
-          <button type="button" class="sample" data-sample="2">Sample</button>
-        </div>
+      <p class="hint">Click a panel in the preview to pick it, then drag its photo to reframe it and scroll to zoom. You can also drop an image file straight onto a panel.</p>
+      <div class="panel-row is-selected">
+        <span class="panel-name">Panel 1</span>
+        <input type="file" accept="image/*" hidden>
+        <button type="button" class="upload-btn">Upload</button>
+        <button type="button" class="sample-btn">Sample</button>
       </div>
-      <label class="check"><input type="checkbox" id="singlePhoto"> One photo in every panel</label>
-      <label class="zoomrow">Zoom the selected panel
-        <input type="range" id="zoom" min="1" max="2.5" step="0.05" value="1">
-      </label>
-      <button type="button" class="ghost" id="reframe">Reframe selected panel</button>
+      <div class="panel-row">
+        <span class="panel-name">Panel 2</span>
+        <input type="file" accept="image/*" hidden>
+        <button type="button" class="upload-btn">Upload</button>
+        <button type="button" class="sample-btn">Sample</button>
+      </div>
+      <div class="panel-row">
+        <span class="panel-name">Panel 3</span>
+        <input type="file" accept="image/*" hidden>
+        <button type="button" class="upload-btn">Upload</button>
+        <button type="button" class="sample-btn">Sample</button>
+      </div>
+      <label class="check"><input type="checkbox" id="single"> One photo in every panel</label>
+      <label class="slider-label" for="zoom">Zoom the selected panel</label>
+      <input type="range" id="zoom" min="100" max="300" value="100" step="1">
+      <button type="button" id="reframe" class="ghost-btn">Reframe selected panel</button>
     </fieldset>
 
-    <fieldset>
+    <fieldset class="group caption">
       <legend>Caption</legend>
-      <label>Title
-        <input id="title" type="text" maxlength="48" value="Boulevard Queen" autocomplete="off">
-      </label>
-      <label>Tagline
-        <input id="tagline" type="text" maxlength="60" value="Vice City, after dark" autocomplete="off">
-      </label>
+      <label for="title">Title</label>
+      <input type="text" id="title" maxlength="60" value="Boulevard Queen">
+      <label for="tagline">Tagline</label>
+      <input type="text" id="tagline" maxlength="60" value="Vice City, After Dark">
     </fieldset>
 
-    <button id="export" type="button" class="export">Export PNG</button>
+    <button type="button" id="export" class="export-btn">Export PNG</button>
     <p id="status" role="status"></p>
   </section>
 
-  <section class="stage" aria-label="Cover preview">
-    <canvas id="cover" width="1080" height="1080"></canvas>
-    <p class="stage-note">Click a panel to select it · drag to move the photo · scroll to zoom</p>
+  <section class="preview" aria-label="Cover preview">
+    <canvas id="cover" width="1080" height="1080" aria-label="The cover"></canvas>
+    <p class="preview-hint">Click a panel to select it · drag to move the photo · scroll to zoom</p>
   </section>
 </main>
 <script type="module" src="./src/main.js"></script>

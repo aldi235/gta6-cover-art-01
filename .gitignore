@@ -1,2 +1,11 @@
+# Vice Cover Studio — local-only files, never part of the entry.
+# The handoff output of `MAKEFUN_OUTPUT_DIR=out node main.ts`, editor and
+# OS junk, and anything a local tool drops in the checkout.
 out/
+out2/
+out1/
 node_modules/
+.DS_Store
+Thumbs.db
+*.log
+coverage/

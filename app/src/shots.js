@@ -1,56 +1,67 @@
-// Fixed scenes for screenshots. ?shot=editor shows the page with sample
-// photos loaded; ?shot=cover hides the editor so the cover fills the frame.
-// Query params: layout, size, grade, title, tagline, photo (sample offset).
-// window.__shotReady is set once the scene has painted.
-import { SIZES } from './cover.js';
+// Fixed scenes for screenshots: ?shot=editor shows the page with photos
+// loaded; ?shot=cover shows the cover alone, edge to edge. Query knobs:
+// layout, size, grade, photo1/2/3 (sample names), title, tagline, single,
+// select (which panel the outline marks). window.__shotReady is set once
+// the scene is painted with the poster font in place.
+import { SIZES, SAMPLES } from './cover.js';
 
-const SAMPLES = ['samples/boulevard.jpg', 'samples/pier.jpg', 'samples/synthwave.jpg'];
-const LAYOUTS = ['vice', 'triptych', 'hero'];
-const GRADES = ['sunset', 'neon', 'noir', 'pastel'];
-
-function loadImage(url) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.src = url;
+function setActive(groupId, value) {
+  document.querySelectorAll(`#${groupId} button[data-value]`).forEach((b) => {
+    b.classList.toggle('is-active', b.dataset.value === value);
   });
 }
 
-function syncControl(segId, key, value) {
-  document.querySelectorAll(`#${segId} button`).forEach((el) => {
-    el.classList.toggle('on', el.dataset[key] === value);
-  });
-}
-
-export async function runShot(shot, query, state, redraw) {
+export async function runShot(shot, query, api) {
+  const { state, loadImage, resizeCanvas, redraw, syncPanelControls, selectPanel } = api;
   if (shot === 'cover') document.body.classList.add('shot-cover');
+  // A cover shot shows the exported art: no selection outline on it.
+  state.showSelection = shot !== 'cover';
+
   const layout = query.get('layout');
-  if (layout && LAYOUTS.includes(layout)) state.layout = layout;
+  if (layout) state.layout = layout;
   const size = query.get('size');
-  if (size && SIZES[size]) state.sizeKey = size;
+  if (size && SIZES[size]) state.size = size;
   const grade = query.get('grade');
-  if (grade && GRADES.includes(grade)) state.grade = grade;
-  if (query.get('title') !== null) state.title = query.get('title');
-  if (query.get('tagline') !== null) state.tagline = query.get('tagline');
-  const offset = Number(query.get('photo') ?? 0) || 0;
-  const [a, b, c] = await Promise.all([0, 1, 2].map((i) =>
-    loadImage(SAMPLES[(offset + i) % SAMPLES.length]).catch(() => null)));
-  if (a) state.photos[0] = a;
-  if (b) state.photos[1] = b;
-  if (c) state.photos[2] = c;
-  state.pans = [{ x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }];
-  state.zooms = [1, 1, 1];
-  state.singlePhoto = false;
-  // Sync the visible controls with the scene, so the editor shot is truthful.
-  const titleInput = document.getElementById('title');
-  const tagInput = document.getElementById('tagline');
-  if (titleInput) titleInput.value = state.title;
-  if (tagInput) tagInput.value = state.tagline;
-  syncControl('layoutSeg', 'layout', state.layout);
-  syncControl('sizeSeg', 'size', state.sizeKey);
-  syncControl('gradeSeg', 'grade', state.grade);
-  try { await document.fonts.ready; } catch { /* draw with what loaded */ }
+  if (grade) state.grade = grade;
+  const title = query.get('title');
+  if (title !== null) state.title = title;
+  const tagline = query.get('tagline');
+  if (tagline !== null) state.tagline = tagline;
+  state.singlePhoto = query.get('single') === '1';
+
+  // Keep the visible controls in step with the scene.
+  setActive('layout-group', state.layout);
+  setActive('size-group', state.size);
+  setActive('grade-group', state.grade);
+  document.getElementById('title').value = state.title;
+  document.getElementById('tagline').value = state.tagline;
+  document.getElementById('single').checked = state.singlePhoto;
+
+  const names = [0, 1, 2].map((i) => {
+    const asked = query.get(`photo${i + 1}`);
+    return SAMPLES.includes(asked) ? asked : SAMPLES[i];
+  });
+  resizeCanvas();
+  const images = await Promise.all(names.map((n) => loadImage(`samples/${n}.jpg`)));
+  images.forEach((img, i) => {
+    state.panels[i].img = img;
+    state.panels[i].zoom = 1;
+    state.panels[i].ox = 0;
+    state.panels[i].oy = 0;
+  });
+
+  const select = Number(query.get('select'));
+  selectPanel(Number.isInteger(select) && select >= 0 && select <= 2 ? select : 0);
+  syncPanelControls();
+  redraw();
+
+  // Wait for the poster font, then two frames, so the paint is final.
+  try {
+    await document.fonts.load('900 100px "Poster Black"');
+    await document.fonts.ready;
+  } catch {
+    // The fallback font still paints a cover.
+  }
   redraw();
   await new Promise((resolve) => {
     requestAnimationFrame(() => requestAnimationFrame(resolve));
