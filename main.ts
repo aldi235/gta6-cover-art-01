@@ -1,9 +1,10 @@
 // Vice Cover Studio — hands the app in (Node 22, standard library only).
-// The app is this directory's app/ folder: plain static files a desktop
-// browser loads offline (app/index.html and its ES modules, no library and no
-// network request). This program copies app/ and screenshots/ from beside
-// this file to /output and writes /output/dossier.json, the summary the
-// judge reads, with the vendored make.fun library.
+//
+// The app is this directory's app/ folder: plain static files that a desktop
+// browser loads offline (index.html plus its ES modules; no libraries, no
+// network requests). This program copies app/ and screenshots/ from beside
+// this file into the output directory and writes dossier.json there — the
+// summary the judge reads — using the vendored make.fun library.
 //
 // Try it locally: `node serve.ts`, then open http://localhost:8080.
 // Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output:
@@ -24,10 +25,9 @@ if (existsSync(join(here, 'screenshots'))) {
   cpSync(join(here, 'screenshots'), join(out, 'screenshots'), { recursive: true });
 }
 
-// The scorer's own caps: only text_max_bytes shapes the bytes; the others
-// refuse an entry the scorer would refuse (more than 4 screenshots or one
-// over 256 KiB; more than 993 files in app/ or 48 MiB of app files in all,
-// or a path under app/ over 1000 bytes).
+// The caps mirror the scorer's: only text_max_bytes shapes the bytes, the
+// rest refuse an entry the scorer would refuse (more than 4 screenshots or
+// one over 256 KiB; app/ over 993 files or 48 MiB, or a path over 1000 bytes).
 writeFileSync(
   join(out, 'dossier.json'),
   buildDossier(out, {

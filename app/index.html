@@ -3,14 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vice Cover Studio — GTA-style cover art maker</title>
+<title>Vice Cover Studio — make GTA-style poster cover art</title>
 <link rel="stylesheet" href="./style.css">
 </head>
 <body>
 <main class="app">
-  <section class="controls" aria-label="Cover controls">
+  <section class="panel" aria-label="Cover controls">
     <h1>VICE COVER <span>STUDIO</span></h1>
-    <p class="lede">Your photos, a caption, and a Vice City sunset — made into poster cover art. Everything runs on your machine; photos are never uploaded.</p>
+    <p class="intro">Turn your own photos and a caption into a Vice City poster
+      cover. Pick a layout, a size and a colour grade, frame each photo, then
+      export a PNG. Your photos never leave this machine.</p>
 
     <fieldset>
       <legend>Layout</legend>
@@ -22,7 +24,7 @@
     </fieldset>
 
     <fieldset>
-      <legend>Size</legend>
+      <legend>Export size</legend>
       <div class="seg" id="sizeSeg" role="group" aria-label="Export size">
         <button type="button" data-size="square" class="on">1080 × 1080</button>
         <button type="button" data-size="portrait">1080 × 1350</button>
@@ -42,7 +44,9 @@
 
     <fieldset>
       <legend>Photos</legend>
-      <p class="hint">Click a panel in the preview to select it, then drag the photo to move it, scroll to zoom. Or drop an image file straight onto a panel.</p>
+      <p class="hint">Click a panel in the preview to pick it, then drag its
+        photo to reframe it and scroll to zoom. You can also drop an image
+        file straight onto a panel.</p>
       <div class="slots" id="slots">
         <div class="slot" data-slot="0">
           <span class="slot-name">Panel 1</span>
@@ -60,8 +64,8 @@
           <button type="button" class="sample" data-sample="2">Sample</button>
         </div>
       </div>
-      <label class="check"><input type="checkbox" id="singlePhoto"> Use one photo for every panel</label>
-      <label class="zoomrow">Zoom selected panel
+      <label class="check"><input type="checkbox" id="singlePhoto"> One photo in every panel</label>
+      <label class="zoomrow">Zoom the selected panel
         <input type="range" id="zoom" min="1" max="2.5" step="0.05" value="1">
       </label>
       <button type="button" class="ghost" id="reframe">Reframe selected panel</button>
